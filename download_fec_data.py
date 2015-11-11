@@ -7,8 +7,12 @@ from subprocess import call
 import sys
 from zipfile import ZipFile
 
+if len(sys.argv < 2):
+	print("Usage: python download_fec_data.py 20151103 [20151104]")
+	print("This would download and process all FEC data for Nov 3 and Nov 4.")
+
 mindate_s = sys.argv[1]
-maxdate_s = sys.argv[2]
+maxdate_s = sys.argv[2] if len(sys.argv) > 2 else mindate_s
 
 mindate = datetime.strptime(mindate_s, "%Y%m%d")
 maxdate = datetime.strptime(maxdate_s, "%Y%m%d")
