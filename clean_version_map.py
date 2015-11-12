@@ -21,7 +21,7 @@ def proc_row(row):
             fec_map[version][form].append(name)
 
 
-df = pd.read_excel("fec_version_map.xlsx", sheetname="all versions")
+df = pd.read_excel("fec_version_map.xlsx", sheetname="all versions", header=None)
 
 df.apply(proc_row, axis=1)
 

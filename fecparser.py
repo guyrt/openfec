@@ -11,19 +11,18 @@ class FecFileParser(object):
         definitions.seek(0)
         self.upload_date = upload_date
         self.organization_information = dict()
-        self.header = dict()
 
     def getschema(self, version, linetype):
         versioned_formdata = self.feclookup['v' + version]
-        i = len(linetype) - 1
+        i = len(linetype)
         while i >= 0 and linetype[:i] not in versioned_formdata:
             i -= 1
         if not linetype:
             raise Exception("Could not match linetype {0} on version {1}".format(linetype, version))
-        import pdb; pdb.set_trace()
-        return linetype[:i], versioned_formdata[linetype[:i]]
+        final_key = linetype[:i]
+        return final_key, versioned_formdata.get(final_key, dict())
 
-    def processfile(self, filehandle):
+    def processfile(self, filehandle, filename):
         """
         Process all lines of a file and list of dictionaries, one per line.
         """
@@ -31,22 +30,37 @@ class FecFileParser(object):
         if first_line[0] != "HDR":
             raise Exception("Failed to parse: HDR expected on first line")
 
-        fileversion = first_line[2]
+        fileversion = first_line[2].strip()
+
+        in_comment = False
 
         for line in filehandle:
-            line = line.strip().split(chr(28))
+            line = line.strip()
+
+            if not line:
+                continue
+            
+            if line == '[BEGINTEXT]':
+                in_comment = True
+                continue
+            elif in_comment:
+                if line == '[ENDTEXT]':
+                    in_comment = False
+                continue
+
+            line = line.split(chr(28))
             linetype = line[0]
             clean_linetype, schema = self.getschema(fileversion, linetype)
+            if schema:
+                line_dict = {k: v for k, v in zip(schema, line)}
+            else:
+                line_dict = {'contents': ','.join(line), 'clean_linetype': clean_linetype, 'FORM': linetype, "Error": "NoSchema"}
+                line_dict['filename'] = filename
+                line_dict["clean_linetype"] = clean_linetype
+                line_dict['upload_date'] = self.upload_date
 
-            # TODO - F3 lines should be used to produce a dictionary of information about each organization. Must be second in every file.
-
-            line_dict = {k: v for k, v in zip(schema, line)}
-            line_dict["clean_linetype"] = clean_linetype
-            line_dict['upload_date'] = upload_date
-
-            if clean_linetype == "F3":
+            if clean_linetype[0] == "F" and schema:
                 self.organization_information = line_dict
-            elif clean_linetype == "HEAD":
-                self.header = line_dict
-
+                
+            
             yield line_dict
