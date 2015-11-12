@@ -5,7 +5,7 @@ Download the Data
 
 Use python script download_fec_data.py to unpack data from the fec locally. Call the function like
 
-    python ./download_fec_data.py YYYYmmDD [YYYYmmDD]
+    python ./download_fec_data.py fecdefs.json YYYYmmDD [YYYYmmDD]
 
 This will download every day's filings in the range (inclusive) and unzip all the files to the ./data folder within your repo.
 
