@@ -7,7 +7,7 @@ from subprocess import call
 import sys
 from zipfile import ZipFile
 
-if len(sys.argv < 2):
+if len(sys.argv) < 2:
 	print("Usage: python download_fec_data.py 20151103 [20151104]")
 	print("This would download and process all FEC data for Nov 3 and Nov 4.")
 
