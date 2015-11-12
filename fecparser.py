@@ -26,7 +26,7 @@ class FecFileParser(object):
         """
         Process all lines of a file and list of dictionaries, one per line.
         """
-        first_line = filehandle.readline().strip().split(chr(28))
+        first_line = filehandle.readline().replace('"', '').strip().split(chr(28))
         if first_line[0] != "HDR":
             raise Exception("Failed to parse: HDR expected on first line")
 
@@ -36,6 +36,7 @@ class FecFileParser(object):
 
         for line in filehandle:
             line = line.strip()
+            line = line.replace('"', '')
 
             if not line:
                 continue

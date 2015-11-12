@@ -79,6 +79,7 @@ for i in range(num_days_to_pull + 1):
     # process each file
     fec_defs = open(sys.argv[1])
     for fecfile in z.namelist():
+        print("Processing " + fecfile)
         parser = FecFileParser(fec_defs, date_str)
         for line in parser.processfile(open("{2}/{0}/{1}".format(date_str, fecfile, tmp_data_folder)), fecfile):
             filehandles[date_str].write(dumps(line) + "\n")
