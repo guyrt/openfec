@@ -33,5 +33,13 @@ for date in date_range:
     		line = json.loads(line)
     		if "FILER COMMITTEE ID NUMBER" in line and line["FILER COMMITTEE ID NUMBER"] != committee:
     			com = line['FILER COMMITTEE ID NUMBER']
-    			print(orgs.get(com, com) + ' ' + line['CONTRIBUTION AGGREGATE{F3L Semi-annual Bundled}'])
+
+    			if 'CONTRIBUTION AGGREGATE{F3L Semi-annual Bundled}' in line:
+    				suffix = ' ' + line['CONTRIBUTION AGGREGATE{F3L Semi-annual Bundled}']
+    			elif 'EXPENDITURE AMOUNT {F3L Bundled}' in line:
+    				suffix = ' ' + line['EXPENDITURE AMOUNT {F3L Bundled}']
+    			else:
+    				suffix = ''
+
+    			print(orgs.get(com, com) + suffix)
 
