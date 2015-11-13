@@ -1,3 +1,5 @@
+# Find committees that give to each other.
+
 import json
 import sys
 import analysis_utils
@@ -15,14 +17,36 @@ for date in date_range:
 	f = open("data/org_defs_{0}.json".format(date))
 	for line in f:
 		line = json.loads(line)
+		value = ''
 		if 'COMMITTEE NAME' in line:
-			orgs[line['FILER COMMITTEE ID NUMBER']] = 'COMMITTEE NAME ' + line['COMMITTEE NAME'] + ' ' + line['FORM TYPE'] + ' ' + line['FILER COMMITTEE ID NUMBER']
+			value = line['COMMITTEE NAME']
 		elif '5. JOINT FUND PARTICIPANT CMTTE NAME' in line:
-			orgs[line['FILER COMMITTEE ID NUMBER']] = 'JOINT FUND PARTICIPANT CMTTE NAME ' + line['5. JOINT FUND PARTICIPANT CMTTE NAME'] + ' ' + line['FORM TYPE'] + ' ' + line['FILER COMMITTEE ID NUMBER']
+			value = line['5. JOINT FUND PARTICIPANT CMTTE NAME']
 		elif 'ORGANIZATION NAME' in line:
-			orgs[line['FILER COMMITTEE ID NUMBER']] = 'ORGANIZATION NAME ' + line['ORGANIZATION NAME'] + ' ' + line['FORM TYPE'] + ' ' + line['FILER COMMITTEE ID NUMBER']
+			value = line['ORGANIZATION NAME'] 
 		elif 'PCC COMMITTEE NAME' in line:
-			orgs[line['FILER CANDIDATE ID NUMBER']] = 'PCC COMMITTEE NAME ' + line['PCC COMMITTEE NAME'] + ' ' + line['FORM TYPE']+ ' ' + line['FILER CANDIDATE ID NUMBER']
+			value = line['PCC COMMITTEE NAME'] 
+
+		if not value:
+			continue
+
+		value += ' ' + line['FORM TYPE'] 
+
+		if '5. PARTY CODE' in line:
+			value += ' (' + line['5. PARTY CODE'] + ')'
+
+		key = ''
+		if 'FILER COMMITTEE ID NUMBER' in line:
+			key = 'FILER COMMITTEE ID NUMBER'
+			value += ' ' + line[key]
+		else:
+			key = 'FILER CANDIDATE ID NUMBER'
+			value += ' ' + line[key]
+
+		orgs[line[key]] = value
+
+print("Finding links to {0}".format(orgs[committee]))
+print()
 
 
 for date in date_range:
@@ -32,7 +56,12 @@ for date in date_range:
 #    		print(line)
     		line = json.loads(line)
     		if "FILER COMMITTEE ID NUMBER" in line and line["FILER COMMITTEE ID NUMBER"] != committee:
+
+    			relationship = analysis_utils.reverse_lookup(line, committee)
+
     			com = line['FILER COMMITTEE ID NUMBER']
+
+    			prefix = line["FORM TYPE"] + ' ' + relationship + ' for '
 
     			if 'CONTRIBUTION AGGREGATE{F3L Semi-annual Bundled}' in line:
     				suffix = ' ' + line['CONTRIBUTION AGGREGATE{F3L Semi-annual Bundled}']
@@ -41,5 +70,5 @@ for date in date_range:
     			else:
     				suffix = ''
 
-    			print(orgs.get(com, com) + suffix)
+    			print(prefix + orgs.get(com, com) + suffix)
 

@@ -17,3 +17,10 @@ I got the xlsx from http://www.fec.gov/finance/disclosure/ftpefile.shtml. Downlo
 
 Use clean_version_map.py to create fecdefs.json from fec_version_map.xlsx
 
+Examples
+========
+
+The analysis folder contains some usage examples.
+
+*find_committee_pairings.py*
+Find connections from one Committee to another.
