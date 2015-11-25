@@ -39,7 +39,7 @@ def organization_to_string(line):
     elif 'ORGANIZATION NAME' in line:
         value = line['ORGANIZATION NAME'] 
     elif 'PCC COMMITTEE NAME' in line:
-        value = line['PCC COMMITTEE NAME'] 
+        value = line['PCC COMMITTEE NAME']
 
     if not value:
         raise NoNameInLine()
@@ -49,7 +49,14 @@ def organization_to_string(line):
     if '5. PARTY CODE' in line:
         value += ' (' + line['5. PARTY CODE'] + ')'
 
+    if "ELECTION STATE" in line:
+        value += " (Running in: " + line["ELECTION STATE"] + ")"
+    
     key = key_for_org(line)
     value += ' ' + line[key]
 
     return value
+
+
+def line_from_org(line, committee):
+    return "FILER COMMITTEE ID NUMBER" in line and line["FILER COMMITTEE ID NUMBER"].lower() == committee.lower()

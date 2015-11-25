@@ -22,7 +22,7 @@ for date in date_range:
         if keep:
             jline = json.loads(line)
             try:
-                output = analysis_utils.organization_to_string(jline)
+                output = date + ": " + analysis_utils.organization_to_string(jline)
             except analysis_utils.NoNameInLine:
                 print("Matched no print")
                 break

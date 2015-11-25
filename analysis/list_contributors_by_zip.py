@@ -10,7 +10,7 @@ date_range = analysis_utils.days_in_range(start_date, end_date)
 
 exclude_forms = ["F3", "SB", "SD"]
 
-donation_by_state = dict()
+donation_by_location = dict()
 
 for date in date_range:
     f = open("data/filings_{0}.json".format(date))
@@ -22,7 +22,6 @@ for date in date_range:
             if "FORM TYPE" not in line:
                 continue
 
-
             exclude = False
             for form in exclude_forms:
                 exclude = exclude or line["FORM TYPE"].startswith(form)
@@ -30,7 +29,7 @@ for date in date_range:
             if exclude:
                 continue
 
-            if "FILER COMMITTEE ID NUMBER" in line and line["FILER COMMITTEE ID NUMBER"] == committee:
+            if analysis_utils.line_from_org(line, committee):
                 
                 key = 'CONTRIBUTION AMOUNT {F3L Bundled}'
                 if key in line:
@@ -40,12 +39,12 @@ for date in date_range:
 
                 state = line["CONTRIBUTOR STATE"]
                 city = line["CONTRIBUTOR CITY"]
-                zipcode = line["CONTRIBUTOR ZIP"]
+                zipcode = line["CONTRIBUTOR ZIP"][:5]
                 key = "{0},{1},{2}".format(state, city, zipcode)
-                if key not in donation_by_state:
-                    donation_by_state[key] = 0
-                donation_by_state[key] += float(amount)
+                if key not in donation_by_location:
+                    donation_by_location[key] = 0
+                donation_by_location[key] += float(amount)
 
 
-for k in sorted(donation_by_state.keys()):
-    print("{0}, {1}".format(k, donation_by_state[k]))
+for k in sorted(donation_by_location.keys()):
+    print("{0}, {1}".format(k, donation_by_location[k]))
