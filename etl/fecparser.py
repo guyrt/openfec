@@ -57,11 +57,11 @@ class FecFileParser(object):
             else:
                 line_dict = {'contents': ','.join(line), 'clean_linetype': clean_linetype, 'FORM': linetype, "Error": "NoSchema"}
                 line_dict['filename'] = filename
-                line_dict["clean_linetype"] = clean_linetype
-                line_dict['upload_date'] = self.upload_date
+
+            line_dict["clean_linetype"] = clean_linetype
+            line_dict['upload_date'] = self.upload_date
 
             if clean_linetype[0] == "F" and schema:
                 self.organization_information = line_dict
-                
-            
+
             yield line_dict

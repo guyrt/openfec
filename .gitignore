@@ -4,3 +4,4 @@ tmp_data
 data
 .idea/
 etl/documentdb/documentdb_config.py
+etl/azureblob/blob_config.py

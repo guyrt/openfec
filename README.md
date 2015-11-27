@@ -5,9 +5,13 @@ Download the Data
 
 Use python script download_fec_data.py to unpack data from the fec locally. Call the function like
 
-    python ./download_fec_data.py fecdefs.json YYYYmmDD [YYYYmmDD]
+    python ./etl/download_fec_data.py ./metadata/fecdefs.json YYYYmmDD YYYYmmDD [azure]
 
-This will download every day's filings in the range (inclusive) and unzip all the files to the ./data folder within your repo. You'll get two kinds of files: org_defs_YYYYMMDD.json list all header rows. filings_YYYYMMDD.json list all remaining rows.
+This will download every day's filings in the range (inclusive) and unzip all the files to the ./data folder within your repo.
+You'll get two kinds of files: org_defs_YYYYMMDD.json list all header rows. filings_YYYYMMDD.json list all remaining rows in files from that day.
+
+Adding azure as the fourth argument will cause an upload to an azure blob as specified in ./etl/azureblob/upload_file_to_blob.py. This is helpful
+for larger analysis where a spark cluster is necessary.
 
 
 Building the FEC file definition map.
