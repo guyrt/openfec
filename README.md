@@ -13,20 +13,24 @@ You'll get two kinds of files: org_defs_YYYYMMDD.json list all header rows. fili
 Adding azure as the fourth argument will cause an upload to an azure blob as specified in ./etl/azureblob/upload_file_to_blob.py. This is helpful
 for larger analysis where a spark cluster is necessary.
 
+There is also a library to upload to Azure DocumentDB. This is a good starting place to make a searchable data source, but I didn't hook it to the download_fec_data path.
 
 Building the FEC file definition map.
 ================================
 
 I got the xlsx from http://www.fec.gov/finance/disclosure/ftpefile.shtml. Download the file defns zip and unpack the full definitions spreadsheet.
 
-Use clean_version_map.py to create fecdefs.json from fec_version_map.xlsx
+In the metadata folder, use clean_version_map.py to create fecdefs.json from fec_version_map.xlsx
 
 Examples
 ========
 
-The analysis folder contains some usage examples.
+The analysis folder contains some usage examples from local data. To be honest, I got a little ways with this approach
+before deciding to implement azure upload so I could use spark. There is a great deal of ETL that would need to be done
+ to make this data easy to use locally.
 
-*analysis_utils.py* A few utilities to help parse the data. 
+*analysis_utils.py* A few utilities to help parse the data. In particular, attempts to handle the nasty keys that this data
+ produces to produce at least somewhat sensible descriptions of organizations and their behavior.
 
 *find_committee_pairings.py* Find connections from one Committee to another.
 
