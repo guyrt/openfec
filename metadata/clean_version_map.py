@@ -18,6 +18,9 @@ def proc_row(row):
         rowelt = row[x]
         if not pd.isnull(row[x]):
             _, name = rowelt.split('-', 1)
+            name = name.replace(".", "")
+            name = name.replace("/", "")
+            name = name.replace(" ", "_")
             fec_map[version][form].append(name)
 
 

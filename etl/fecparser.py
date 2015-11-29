@@ -63,5 +63,5 @@ class FecFileParser(object):
 
             if clean_linetype[0] == "F" and schema:
                 self.organization_information = line_dict
-
-            yield line_dict
+            else:
+                yield line_dict

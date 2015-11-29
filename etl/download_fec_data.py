@@ -76,8 +76,8 @@ mindate = datetime.strptime(mindate_s, "%Y%m%d")
 maxdate = datetime.strptime(maxdate_s, "%Y%m%d")
 
 
-tmp_data_folder = "../tmp_data"
-clean_data_folder = "../data"
+tmp_data_folder = "./tmp_data"
+clean_data_folder = "./data"
 
 
 try:
