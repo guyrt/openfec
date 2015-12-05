@@ -22,8 +22,12 @@ I got the xlsx from http://www.fec.gov/finance/disclosure/ftpefile.shtml. Downlo
 
 In the metadata folder, use clean_version_map.py to create fecdefs.json from fec_version_map.xlsx
 
-Examples
-========
+After some initial investigation, I made the choice to clean up some field names. In particular, I replace all spaces with underscores to make SQL operations easier.
+I also remove periods. Some fields like "5. COMMITTEE TYPE" didn't read in SparkSQL even with backticks, so I removed the period. For similar reasons, I chose
+to remove "/" characters from mappings.
+
+Local Examples
+==============
 
 The analysis folder contains some usage examples from local data. To be honest, I got a little ways with this approach
 before deciding to implement azure upload so I could use spark. There is a great deal of ETL that would need to be done

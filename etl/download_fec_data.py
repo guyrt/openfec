@@ -110,7 +110,9 @@ if blob_upload:
     print("Local storage done. Uploading to azure blob.")
 
     for filedate, fileobj in filehandles.items():
+        print("Uploading main data for {0}".format(filedate))
         blob_upload.put_json_file(fileobj, "raw_filings/{0}.json".format(filedate))
 
+    print("Uploading headers")
     for filedate, fileobj in org_defs.items():
         blob_upload.put_json_file(fileobj, "raw_headers/{0}.json".format(filedate))
