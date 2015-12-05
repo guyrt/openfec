@@ -13,6 +13,8 @@ from fecparser import FecFileParser
 """
 Define a few functions and two global variables that we'll need to handle upload.
 """
+
+
 def pull_data(date_str, tmp_data_folder, fake=False):
     # Pull file
     url = "ftp://ftp.fec.gov/FEC/electronic/{0}.zip".format(date_str)
@@ -56,7 +58,7 @@ Run the program.
 """
 
 if len(sys.argv) < 3:
-    print("Usage: python download_fec_data.py fecdefs.json 20151103 20151104 [azure]")
+    print("Usage: python download_fec_filings.py fecdefs.json 20151103 20151104 [azure]")
     print("This would download and process all FEC data for Nov 3 and Nov 4.")
 
 mindate_s = sys.argv[2]

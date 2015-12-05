@@ -4,13 +4,14 @@ from .blob_config import *
 
 class BlobUploader(object):
 
-    def __init__(self, make_container_public=False):
+    def __init__(self, blob_container=None, make_container_public=False):
         """
         Class to handle uploading to an azure blob connection.
 
         :param make_container_public: True iff you are okay with public read access to your data. Useful for teaching a course
         :return:
         """
+        self.blob_container = blob_container or BLOB_CONTAINER
         self.blob_service = BlobService(account_name=BLOB_ACCOUNTNAME, account_key=BLOB_ACCOUNTKEY)
         if make_container_public:
             self.blob_service.create_container(BLOB_CONTAINER, x_ms_blob_public_access="container")
@@ -25,4 +26,4 @@ class BlobUploader(object):
         <prefix>/YYYYMMDD.json
         """
         file_obj.seek(0)
-        self.blob_service.put_block_blob_from_path(BLOB_CONTAINER, filename, file_obj.name, x_ms_blob_content_type="text/json")
+        self.blob_service.put_block_blob_from_path(self.blob_container, filename, file_obj.name, x_ms_blob_content_type="text/json")
