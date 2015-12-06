@@ -1,6 +1,6 @@
 # ftp://ftp.fec.gov/FEC/electronic/
-
 import urllib.request as request
+
 from datetime import datetime, timedelta
 import os
 import sys
@@ -9,10 +9,13 @@ from json import dumps
 
 from fecparser import FecFileParser
 
-
 """
 Define a few functions and two global variables that we'll need to handle upload.
 """
+
+# set up file handles
+filehandles = dict()
+org_defs = dict()
 
 
 def pull_data(date_str, tmp_data_folder, fake=False):
@@ -26,11 +29,6 @@ def pull_data(date_str, tmp_data_folder, fake=False):
         f.write(r.read())
         f.close()
     return ziploc, unziploc
-
-
-# set up file handles
-filehandles = dict()
-org_defs = dict()
 
 
 def local_store_unzipped_folder(zip_obj):
@@ -49,8 +47,6 @@ def local_store_unzipped_folder(zip_obj):
         org_defs[date_str].write(dumps(parser.organization_information) + "\n")
 
     return filehandles
-
-
 
 
 """
