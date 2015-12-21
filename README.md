@@ -26,6 +26,26 @@ After some initial investigation, I made the choice to clean up some field names
 I also remove periods. Some fields like "5. COMMITTEE TYPE" didn't read in SparkSQL even with backticks, so I removed the period. For similar reasons, I chose
 to remove "/" characters from mappings.
 
+Other Data:
+===========
+
+In addition to the raw filings, I've written parsers for the following sources:
+
+**List all committees and candidates**
+
+`python ./etl/download_fec_mappingfiles.py [azure]`
+
+Download the list of candidates and committees from FEC. This list is updated in place on FEC webpage, so my downloader also overwrites. 
+The committee file links to candidates via CAND_ID field. There is another file that lists all connections between committees that I haven't gotten to yet (contributions welcome).
+
+**Zip Code to Congressional District**
+
+`python ./etl/zcta_to_district.py [azure]`
+
+Create a helper csv that maps zipcode tabulation areas to House districts. This is not a 1:1 mapping, and it doesn't include states with only one House seat (i.e. at-large seats). 
+Requires pandas.
+
+
 Local Examples
 ==============
 
