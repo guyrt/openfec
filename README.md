@@ -45,6 +45,12 @@ The committee file links to candidates via CAND_ID field. There is another file 
 Create a helper csv that maps zipcode tabulation areas to House districts. This is not a 1:1 mapping, and it doesn't include states with only one House seat (i.e. at-large seats). 
 Requires pandas.
 
+**Zip code to county**
+
+`python ./etl/zcta_to_county.py [azure]`
+
+Create a helper csv that maps zipcode tabulation area to State/County. This can be helpful for printing.
+
 
 Local Examples
 ==============
