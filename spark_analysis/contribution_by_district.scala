@@ -22,18 +22,18 @@ val num_committees_in_zip = zip_to_committee_DF
 
 // Produce clean records.
 
-val contribution_by_zip = records
+val sa_contributions = records
     .where($"clean_linetype" === "SA")
     .where($"CONTRIBUTION_AMOUNT_{F3L_Bundled}" > 0)
 
-contribution_by_zip.cache()
+sa_contributions.cache()
 
 case class FixedContribution(state: String, zipCode: String, contribution: Double, filerCommitteeId: String)
 
-val records_clean = contribution_by_zip 
+val records_clean = sa_contributions 
     .select($"CONTRIBUTOR_ZIP", $"CONTRIBUTION_AMOUNT_{F3L_Bundled}", $"CONTRIBUTOR_STATE", $"FILER_COMMITTEE_ID_NUMBER")
     .map(z => Array(z(0).asInstanceOf[String], z(1), z(2), z(3)))
-    .filter(z => z(0).asInstanceOf[String] == 5 || z(0).asInstanceOf[String].length == 9)
+    .filter(z => z(0).asInstanceOf[String].length == 5 || z(0).asInstanceOf[String].length == 9)
     .map(z => Array(z(0).asInstanceOf[String].substring(0, 5), z(1), z(2), z(3)))
     .filter(z => z(0) != "")
     .filter(z => z(1) != null)
@@ -65,7 +65,7 @@ val house_candidates = candidates
 
 val contributions_with_candidate = records_by_zip.join(house_candidates, records_by_zip("filerCommitteeId") === house_candidates("CAND_PCC"))
 
-// see rough amounts
+// see rough amount contributed to House candidates.
 contributions_with_candidate.agg(sum("contributions")).show()
 records_by_zip.agg(sum("contributions")).show()
 
@@ -89,10 +89,28 @@ val records_by_district_nomatches = records_reduce
 records_by_district_nomatches.groupBy("state").count().orderBy($"count" * -1).show()
 
 // the non-matches are hard. 
-// Get zip -> county && zip -> district.
 
-// Get county -> district
-// Get county -> #districts
-// County -> district, #districts.
+// for states with 1 district, just fix them.
+val states_one_district = Array(["ND", "SD", "AK", "DE", "MT", "VT", "WY"])
 
+
+// a strategy:
+// Get zip -> city/state && zip -> district.
+// Get city/state -> district
+// Get city/state -> #districts
+// city/state -> district, #districts.
+
+// match to candidate.
+val records_by_district_matches_with_candidate = records_by_district_matches
+    .join(house_candidates, records_by_district_matches("filerCommitteeId") === house_candidates("CAND_PCC"))
+
+
+records_by_district_matches_with_candidate.cache()
+val cross_contributions = records_by_district_matches_with_candidate
+    .groupBy($"CAND_OFFICE_DISTRICT", $"CAND_OFFICE_ST", $"state", $"district")
+    .agg($"CAND_OFFICE_DISTRICT", $"CAND_OFFICE_ST", $"state", $"district", count("contributions"), sum("contributions"))
+
+
+// This isn't showing ANY contributions from 11. That's not right.
+cross_contributions.where($"CAND_OFFICE_DISTRICT" === "11").where($"CAND_OFFICE_ST" === "NC").orderBy($"SUM(contributions)" * -1).show(50)
 
