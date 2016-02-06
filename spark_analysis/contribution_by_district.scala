@@ -65,10 +65,34 @@ val house_candidates = candidates
 
 val contributions_with_candidate = records_by_zip.join(house_candidates, records_by_zip("filerCommitteeId") === house_candidates("CAND_PCC"))
 
+// see rough amounts
+contributions_with_candidate.agg(sum("contributions")).show()
+records_by_zip.agg(sum("contributions")).show()
 
 
+val records_reduce = records_by_zip
+    .join(num_committees_in_zip, records_by_zip("zipCode") === num_committees_in_zip("zcta"), "left_outer")
+    .selectExpr("*", "coalesce(NumDistricts, 1) AS NumDistrictsNotNull")
+    .selectExpr("*", "coalesce(contributions, 1) AS contributionsAdjusted")
 
+records_reduce.groupBy($"NumDistricts").count().show()
 
+// Build out set of matches and non-matches.
+// Get matches and non-matches.
+val zip_to_committee_renamed = zip_to_committee_DF.withColumnRenamed("state", "_state").withColumnRenamed("zcta", "_zcta")
+val records_by_district_matches = records_reduce.join(zip_to_committee_renamed, (records_reduce("state") === zip_to_committee_renamed("_state")) && (records_reduce("zcta") === zip_to_committee_renamed("_zcta")))
+val records_by_district_nomatches = records_reduce
+    .join(zip_to_committee_renamed, (records_reduce("state") === zip_to_committee_renamed("_state")) && (records_reduce("zcta") === zip_to_committee_renamed("_zcta")), "left")
+    .selectExpr("*", "coalesce(_state, \"\") AS _state2")
+    .where($"_state2" === "")
 
+records_by_district_nomatches.groupBy("state").count().orderBy($"count" * -1).show()
+
+// the non-matches are hard. 
+// Get zip -> county && zip -> district.
+
+// Get county -> district
+// Get county -> #districts
+// County -> district, #districts.
 
 
