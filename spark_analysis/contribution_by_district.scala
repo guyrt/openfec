@@ -34,11 +34,20 @@ val num_districts_in_zip = zip_to_district_DF
 //
 
 // Limit to SA type records with a contribution amount. 
-val sa_contributions = records
+var sa_contributions = records
     .where($"clean_linetype" === "SA")
     .where($"CONTRIBUTION_AMOUNT_{F3L_Bundled}" > 0)
 
+//
+// remove duplicate counting from PAC passthrough. PAC contributions earmarked via a PAC
+// show up twice in the raw data. Once has the address of the original donor. The other
+// has the address of the PAC and has BACK_REFERENCE_SCHED_NAME set to something.
+// 
+sa_contributions = sa_contributions
+    .where($"BACK_REFERENCE_SCHED_NAME" === "")
+
 sa_contributions.cache()
+
 
 // Project to subset of columns and fix 9-digit zip codes.
 // We remove rows with bad zipcodes.
@@ -97,8 +106,6 @@ val records_reduce = records_by_zip
     .selectExpr("*", "coalesce(NumDistricts, 1) AS NumDistrictsNotNull")
     .selectExpr("*", "coalesce(contributions, 1) / coalesce(NumDistricts, 1) AS contributionsAdjusted")
 
-// TODO - put this division back in somewhere. It should show up on both of our records_by_district_*matches dfs.
-
 records_reduce.groupBy($"NumDistricts").count().show()
 
 // Build out set of matches and non-matches.
@@ -145,7 +152,11 @@ val cross_contributions = records_by_district_matches_with_candidate
     .groupBy($"CAND_OFFICE_DISTRICT", $"CAND_OFFICE_ST", $"state", $"district")
     .agg($"CAND_OFFICE_DISTRICT", $"CAND_OFFICE_ST", $"state", $"district", count("contributions"), sum("contributions"))
 
-cross_contributions.where($"CAND_OFFICE_DISTRICT" === "11").where($"CAND_OFFICE_ST" === "NC").orderBy($"SUM(contributions)" * -1).show(50)
+cross_contributions
+    .where($"CAND_OFFICE_DISTRICT" === "11")
+    .where($"CAND_OFFICE_ST" === "NC")
+    .orderBy($"SUM(contributions)" * -1)
+    .show(50)
 
 cross_contributions.repartition(1).save("wasb://fecfilings@openfecdata.blob.core.windows.net/processed_output/cross_contributions.json", "json")
 
