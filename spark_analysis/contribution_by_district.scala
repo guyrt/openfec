@@ -100,6 +100,8 @@ records_by_zip.agg(sum("contributions")).show()
 
 //
 // Get the number of districts per zip code. We use this to avoid double counting contributions.
+// This could be improved by allowing contributions to a county that is in the district to be counted at 100%
+// for that candidate.
 //
 val records_reduce = records_by_zip
     .join(num_districts_in_zip, records_by_zip("zipCode") === num_districts_in_zip("zcta"), "left_outer")
@@ -125,7 +127,7 @@ val records_by_district_nomatches = records_reduce
 val states_one_district = sc
     .parallelize(Array("ND", "SD", "AK", "DE", "MT", "VT", "WY"))
     .toDF
-    .selectExpr("1 AS _zcta", "1 AS district", "_1 AS _state")
+    .selectExpr("1 AS _zcta", "0 AS district", "_1 AS _state")
 
 val records_from_single_rep_states = records_by_district_nomatches
     .select($"state", $"zipCode", $"filerCommitteeId", $"contributions", $"zcta", $"NumDistricts", $"NumDistrictsNotNull", $"contributionsAdjusted")
