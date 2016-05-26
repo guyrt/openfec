@@ -105,8 +105,6 @@ for i in range(num_days_to_pull + 1):
     local_store_unzipped_folder(z)
 
 if blob_upload:
-    print("Local storage done. Uploading to azure blob.")
-
     for filedate, fileobj in filehandles.items():
         print("Uploading main data for {0}".format(filedate))
         blob_upload.put_json_file(fileobj, "raw_filings/{0}.json".format(filedate))
